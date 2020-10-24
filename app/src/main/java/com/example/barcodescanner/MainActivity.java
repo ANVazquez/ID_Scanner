@@ -46,9 +46,11 @@ public class MainActivity extends AppCompatActivity {
 
         //receives a reference to Firebase
         public FirebaseHelper(DatabaseReference dbRef, Context context, ListView mListView) {
+            cardPos = getIntent().getIntExtra("cardPosition", cardPos);
             this.dbRef = dbRef;
             this.c = context;
             this.mListView = mListView;
+            System.out.println("++++++++++++++++++ "+cardPos+" ++++++++++++++++++++++++++");
             if (cardPos == 0)
             {
                 //childString = "-Lu3n_fC2B4YekCOgrxP";
@@ -62,10 +64,12 @@ public class MainActivity extends AppCompatActivity {
             else if (cardPos == 2)
             {
                 //childString = "class2";
+                this.retrieve2();
             }
             else if (cardPos == 3)
             {
                 //childString = "class3";
+                this.retrieve3();
             }
 
         }
@@ -168,6 +172,84 @@ public class MainActivity extends AppCompatActivity {
             });
             return students;
         }
+
+        public ArrayList<student> retrieve2() {
+            //if userID is equal to the userID then use classes for th
+            //i believe here we can check to see if the teacher is signed in as a certain teacher or not to enter the proper data
+            dbRef.child("users").child(userID).child("class2").child("students").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    students.clear();
+
+                    if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                        //if the above statement is true we are going to look through the children we have in the database
+                        System.out.println("Students---------" + dataSnapshot.getChildrenCount());
+                        //for each item in
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            //now get course objects and populate our arraylist
+                            student stud = ds.getValue(student.class);
+                            students.add(stud);
+                        }
+                        adapter = new myAdapter(c, students);
+                        mListView.setAdapter(adapter);
+
+                        //enqueue messages so they actually work one after another
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mListView.smoothScrollToPosition(students.size());
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("here", databaseError.getMessage());
+                    Toast.makeText(c, "Error " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+            return students;
+        }
+
+        public ArrayList<student> retrieve3() {
+            //if userID is equal to the userID then use classes for th
+            //i believe here we can check to see if the teacher is signed in as a certain teacher or not to enter the proper data
+            dbRef.child("users").child(userID).child("class3").child("students").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    students.clear();
+
+                    if (dataSnapshot.exists() && dataSnapshot.getChildrenCount() > 0) {
+                        //if the above statement is true we are going to look through the children we have in the database
+                        System.out.println("Students---------" + dataSnapshot.getChildrenCount());
+                        //for each item in
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            //now get course objects and populate our arraylist
+                            student stud = ds.getValue(student.class);
+                            students.add(stud);
+                        }
+                        adapter = new myAdapter(c, students);
+                        mListView.setAdapter(adapter);
+
+                        //enqueue messages so they actually work one after another
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mListView.smoothScrollToPosition(students.size());
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("here", databaseError.getMessage());
+                    Toast.makeText(c, "Error " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+            return students;
+        }
     }
 
     FloatingActionButton fab, fab1, fab2, fab3;
@@ -176,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     ListView listView;
+
     DatabaseReference dbREF;
     FirebaseHelper helper;
     FirebaseAuth mAuth;
@@ -204,10 +287,6 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         userID = user.getUid();
         helper = new FirebaseHelper(dbREF, this, listView);
-
-        cardPos = getIntent().getIntExtra("cardPosition", cardPos);
-        System.out.println(cardPos);
-
 
         fab = (FloatingActionButton)findViewById(R.id.fab);
         fab1 = (FloatingActionButton)findViewById(R.id.fab1);

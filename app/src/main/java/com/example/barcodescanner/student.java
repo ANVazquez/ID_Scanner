@@ -1,7 +1,7 @@
 package com.example.barcodescanner;
 
 public class student {
-    String jNum, firstName, lastName;
+    String jNum, firstName, lastName, attend;
 
     public student() {
 
